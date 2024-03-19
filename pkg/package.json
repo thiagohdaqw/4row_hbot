@@ -1,0 +1,17 @@
+{
+  "name": "FouRow",
+  "collaborators": [
+    "Thiago Paiva <thiagohdaqw@gmail.com>"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "FouRow_bg.wasm",
+    "FouRow.js",
+    "FouRow.d.ts"
+  ],
+  "module": "FouRow.js",
+  "types": "FouRow.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
