@@ -30,6 +30,7 @@
             border-radius: 50%;
             text-align: center;
             color: transparent;
+            transition: 0.5s;
         }
 
         .g-row {
@@ -60,6 +61,9 @@
             <button type="button" class="btn btn-primary" onclick="playColumn(4)">^</button>
             <button type="button" class="btn btn-primary" onclick="playColumn(5)">^</button>
             <button type="button" class="btn btn-primary" onclick="playColumn(6)">^</button>
+        </div>
+        <div>
+            <button type="button" class="btn btn-warning" onclick="reset()">Reiniciar</button>
         </div>
     </main>
 
@@ -93,18 +97,8 @@
                 return;
             }
             turn = false;
-            let found = false;
-            for (let row = 0; row < boardHeight; row++) {
-                const cell = board[row * boardWidth + col];
-                if (cell.textContent == '0') {
-                    cell.textContent = '2';
-                    cell.className = 'cell cell-blue';
-                    found = true;
-                    break;
-                }
-            }
 
-            if (!found) {
+            if (!applyMove(col, true)) {
                 turn = true;
                 return;
             }
@@ -116,34 +110,63 @@
             }
 
             setTimeout(() => {
-                const col = solve(board.map(c => c.textContent).join(''), 10);
+                const col = solve(board.map(c => c.textContent).join(''), 8);
                 console.log(col);
-                for (let row = 0; row < boardHeight; row++) {
-                    const cell = board[row * boardWidth + col];
-                    if (cell.textContent == '0') {
-                        cell.textContent = '1';
-                        cell.className = 'cell cell-red';
-                        break;
-                    }
-                }
+                applyMove(col, false);
                 checkGameOver(false);
             }, 10);
         }
 
+        function applyMove(col, player) {
+            if (col < 0 || col > boardWidth) {
+                end = true;
+                return false;
+            }
+            for (let row = 0; row < boardHeight; row++) {
+                const cell = board[row * boardWidth + col];
+                if (cell.textContent == '0') {
+                    cell.textContent = player ? '2' : '1';
+                    cell.className = `cell ${player ? 'cell-blue' : 'cell-red'}`;
+                    return true;
+                }
+            }
+            return false;
+        }
+
         function checkGameOver(player) {
             end = isGameOver(board.map(c => c.textContent).join(''), player);
+            console.log(end);
             turn = !end;
             if (end) {
                 alert('Acaboussi');
             }
         }
+
+        function firstPlay() {
+            const randint = max => Math.floor(Math.random() * max);
+            const firstPlayCol = randint(boardWidth);
+            applyMove(firstPlayCol, false);
+        }
+
+        function reset() {
+            end = false;
+            turn = false;
+            board.forEach(cell => {
+                cell.textContent = '0';
+                cell.className = 'cell';
+            });
+            firstPlay();
+            turn = true;
+        }
     </script>
     <script type="module">
         import init, { solve as solveFunc, is_game_over } from "./pkg/FouRow.js";
         init().then(() => {
-            turn = true;
             solve = solveFunc;
             isGameOver = is_game_over;
+
+            firstPlay();
+            turn = true;
         });
     </script>
 
