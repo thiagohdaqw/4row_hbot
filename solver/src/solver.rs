@@ -17,25 +17,13 @@ pub type Board = [u8; WIDTH * HEIGHT];
 const SCORE_MAX: i32 = i32::MAX;
 
 
-pub fn solve(board: Board, depth: usize, player: u8) -> i32 {
-    let maximizing_player = player == PLAYER_A;
-    minimax(board, 0, depth, maximizing_player);
-    i32::MAX
+pub fn solve(board: Board, depth: usize) -> usize {
+    minimax(board, 0, depth, true, -SCORE_MAX, SCORE_MAX) as usize
 }
 
-fn minimax(board: Board, depth: usize, max_depth: usize, maximizing_player: bool) -> i32 {
+fn minimax(board: Board, depth: usize, max_depth: usize, maximizing_player: bool, mut alpha: i32, mut beta: i32) -> i32 {
     let player_won = is_game_over(&board, maximizing_player);
     if player_won {
-        println!();
-        
-        println!("{depth} {maximizing_player}");
-        for row in 0..HEIGHT {
-            for col in 0..WIDTH {
-                print!("{} ", board[row*WIDTH + col]);
-            }
-            println!();
-        }
-        println!();
         return SCORE_MAX*(if maximizing_player {1} else {-1});
     }
     if depth + 1 == max_depth {
@@ -48,24 +36,26 @@ fn minimax(board: Board, depth: usize, max_depth: usize, maximizing_player: bool
     if maximizing_player {
         score = i32::MIN;
         for (col, new_board) in generate_next_position(board, PLAYER_A) {
-            let new_score = minimax(new_board, depth + 1, max_depth, false);
+            let new_score = minimax(new_board, depth + 1, max_depth, false, alpha, beta);
+            alpha = std::cmp::max(alpha, new_score);
             if new_score > score {
                 score = new_score;
                 column = col
             }
-            if new_score == SCORE_MAX {
+            if beta <= alpha {
                 break;
             }
         }
     } else {
         score = i32::MAX;
         for (col, new_board) in generate_next_position(board, PLAYER_B) {
-            let new_score = minimax(new_board, depth + 1, max_depth, true);
+            let new_score = minimax(new_board, depth + 1, max_depth, true, alpha, beta);
+            beta = std::cmp::min(beta, new_score);
             if new_score < score {
                 score = new_score;
                 column = col
             }
-            if new_score == -SCORE_MAX {
+            if beta <= alpha {
                 break;
             }
         }
