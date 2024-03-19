@@ -63,7 +63,13 @@
             <button type="button" class="btn btn-primary" onclick="playColumn(6)">^</button>
         </div>
         <div>
-            <button type="button" class="btn btn-warning" onclick="reset()">Reiniciar</button>
+            <button type="button" class="btn btn-warning m-3" onclick="reset()">Reiniciar</button>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="ia-start" onclick="toggleIaStart()" checked>
+                <label class="form-check-label" for="flexCheckDefault">
+                    IA inicia a jogada?
+                </label>
+              </div>
         </div>
     </main>
 
@@ -77,6 +83,7 @@
         var solve = null;
         var isGameOver = null;
         var end = false;
+        var iaStart = true;
 
         for (let row = 0; row < boardHeight; row++) {
             for (let col = 0; col < boardWidth; col++) {
@@ -155,8 +162,15 @@
                 cell.textContent = '0';
                 cell.className = 'cell';
             });
-            firstPlay();
+            if (iaStart) {
+                firstPlay();
+            }
             turn = true;
+        }
+
+        function toggleIaStart() {
+            const checkbox = document.getElementById('ia-start');
+            iaStart = !iaStart;
         }
     </script>
     <script type="module">
@@ -165,7 +179,9 @@
             solve = solveFunc;
             isGameOver = is_game_over;
 
-            firstPlay();
+            if (iaStart) {
+                firstPlay();
+            }
             turn = true;
         });
     </script>
