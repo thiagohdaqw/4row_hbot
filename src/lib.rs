@@ -18,6 +18,6 @@ pub fn solve(board_input: &str, depth: i32) -> usize {
 }
 
 #[wasm_bindgen]
-pub fn is_game_over(board_input: &str) -> bool {
-    solver::is_game_over(&parse_board(board_input))
+pub fn is_game_over(board_input: &str, player: bool) -> bool {
+    solver::is_game_over(&parse_board(board_input), !player)
 }

@@ -78,12 +78,13 @@ export function solve(board_input, depth) {
 
 /**
 * @param {string} board_input
+* @param {boolean} player
 * @returns {boolean}
 */
-export function is_game_over(board_input) {
+export function is_game_over(board_input, player) {
     const ptr0 = passStringToWasm0(board_input, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.is_game_over(ptr0, len0);
+    const ret = wasm.is_game_over(ptr0, len0, player);
     return ret !== 0;
 }
 

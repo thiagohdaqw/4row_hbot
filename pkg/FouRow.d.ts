@@ -8,16 +8,17 @@
 export function solve(board_input: string, depth: number): number;
 /**
 * @param {string} board_input
+* @param {boolean} player
 * @returns {boolean}
 */
-export function is_game_over(board_input: string): boolean;
+export function is_game_over(board_input: string, player: boolean): boolean;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly solve: (a: number, b: number, c: number) => number;
-  readonly is_game_over: (a: number, b: number) => number;
+  readonly is_game_over: (a: number, b: number, c: number) => number;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
 }

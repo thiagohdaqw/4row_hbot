@@ -109,7 +109,7 @@
                 return;
             }
 
-            checkGameOver();
+            checkGameOver(true);
 
             if (end) {
                 return;
@@ -126,12 +126,12 @@
                         break;
                     }
                 }
-                checkGameOver();
+                checkGameOver(false);
             }, 10);
         }
 
-        function checkGameOver() {
-            end = isGameOver(board.map(c => c.textContent).join(''));
+        function checkGameOver(player) {
+            end = isGameOver(board.map(c => c.textContent).join(''), player);
             turn = !end;
             if (end) {
                 alert('Acaboussi');

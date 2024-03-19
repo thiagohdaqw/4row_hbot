@@ -24,7 +24,7 @@ pub fn solve(board: &Board, depth: i32) -> usize {
 }
 
 fn minimax(board: &Board, depth: usize, max_depth: usize, maximizing_player: bool, mut alpha: i32, mut beta: i32) -> i32 {
-    let player_won = is_game_over(&board);
+    let player_won = is_game_over(&board, maximizing_player);
     if player_won {
         return SCORE_MAX*(if maximizing_player {1} else {-1});
     }
@@ -36,30 +36,30 @@ fn minimax(board: &Board, depth: usize, max_depth: usize, maximizing_player: boo
     
 
     if maximizing_player {
-        score = i32::MIN;
+        score = -SCORE_MAX;
         for (col, new_board) in generate_next_position(board.clone(), PLAYER_A) {
             let new_score = minimax(&new_board, depth + 1, max_depth, false, alpha, beta);
-            alpha = std::cmp::max(alpha, new_score);
-            if new_score > score {
+            if new_score >= score {
                 score = new_score;
                 column = col
             }
-            if beta <= alpha {
+            if score > beta {
                 break;
             }
+            alpha = std::cmp::max(alpha, new_score);
         }
     } else {
         score = i32::MAX;
         for (col, new_board) in generate_next_position(board.clone(), PLAYER_B) {
             let new_score = minimax(&new_board, depth + 1, max_depth, true, alpha, beta);
-            beta = std::cmp::min(beta, new_score);
-            if new_score < score {
+            if new_score <= score {
                 score = new_score;
                 column = col
             }
-            if beta <= alpha {
+            if score < alpha {
                 break;
             }
+            beta = std::cmp::min(beta, new_score);
         }
     }
 
@@ -84,10 +84,10 @@ fn generate_next_position(board: Board, player: u8) -> impl Iterator<Item = (usi
         })
 }
 
-pub fn is_game_over(board: &Board) -> bool {
+pub fn is_game_over(board: &Board, maximizing_player: bool) -> bool {
     is_draw(board)
-    || player_won(board, PLAYER_B)
-    || player_won(board, PLAYER_A)
+    || !maximizing_player && player_won(board, PLAYER_A)
+    || maximizing_player && player_won(board, PLAYER_B)
 }
 
 fn is_draw(board: &Board) -> bool{
@@ -176,113 +176,117 @@ fn evaluate_position(board: &Board) -> i32 {
     
     // evaluate horizontal
     for row in 0..HEIGHT {
-        let mut maxPlayerA = 0;
-        let mut maxPlayerB = 0;
-        let mut countPlayerA = 0;
-        let mut countPlayerB = 0;
+        let mut max_player_a = 0;
+        let mut max_player_b = 0;
+        let mut count_player_a = 0;
+        let mut count_player_b = 0;
 
         for col in 0..WIDTH {
             if boardValue!(board, row, col) == EMPTY {
-                countPlayerA = 0;
-                countPlayerB = 0;
+                count_player_a = 0;
+                count_player_b = 0;
                 continue;
             }
             if boardValue!(board, row, col) == PLAYER_A {
-                countPlayerA += 1;
-                maxPlayerA = std::cmp::max(countPlayerA, maxPlayerA);
-                countPlayerB = 0;
+                count_player_a += 1;
+                max_player_a = std::cmp::max(count_player_a, max_player_a);
+                count_player_b = 0;
             } else {
-                countPlayerB += 1;
-                maxPlayerB = std::cmp::max(countPlayerB, maxPlayerB);
-                countPlayerA = 0;
+                count_player_b += 1;
+                max_player_b = std::cmp::max(count_player_b, max_player_b);
+                count_player_a = 0;
             }
+
         }
 
-        evaluation += maxPlayerA - maxPlayerB;
+        evaluation += max_player_a - max_player_b;
     }
 
     // evaluate VERTICAL
     for col in 0..WIDTH {
-        let mut maxPlayerA = 0;
-        let mut maxPlayerB = 0;
-        let mut countPlayerA = 0;
-        let mut countPlayerB = 0;
+        let mut max_player_a = 0;
+        let mut max_player_b = 0;
+        let mut count_player_a = 0;
+        let mut count_player_b = 0;
 
         for row in 0..HEIGHT {
             if boardValue!(board, row, col) == EMPTY {
-                countPlayerA = 0;
-                countPlayerB = 0;
+                count_player_a = 0;
+                count_player_b = 0;
                 continue;
             }
             if boardValue!(board, row, col) == PLAYER_A {
-                countPlayerA += 1;
-                maxPlayerA = std::cmp::max(countPlayerA, maxPlayerA);
-                countPlayerB = 0;
+                count_player_a += 1;
+                max_player_a = std::cmp::max(count_player_a, max_player_a);
+                count_player_b = 0;
             } else {
-                countPlayerB += 1;
-                maxPlayerB = std::cmp::max(countPlayerB, maxPlayerB);
-                countPlayerA = 0;
+                count_player_b += 1;
+                max_player_b = std::cmp::max(count_player_b, max_player_b);
+                count_player_a = 0;
             }
         }
-
-        evaluation += maxPlayerA - maxPlayerB;
+        
+        evaluation += max_player_a - max_player_b;
     }
 
     // evaluate DIAGONALL LEFT
     for k in 3..(WIDTH+HEIGHT-4) {
-        let mut maxPlayerA = 0;
-        let mut maxPlayerB = 0;
-        let mut countPlayerA = 0;
-        let mut countPlayerB = 0;
+        let mut max_player_a = 0;
+        let mut max_player_b = 0;
+        let mut count_player_a = 0;
+        let mut count_player_b = 0;
         for col in 0..(k+1) {
             let row: usize = k - col;
             if row < HEIGHT && col < WIDTH {
                 if boardValue!(board, row, col) == EMPTY {
-                    countPlayerA = 0;
-                    countPlayerB = 0;
+                    count_player_a = 0;
+                    count_player_b = 0;
                     continue;
                 }
                 if boardValue!(board, row, col) == PLAYER_A {
-                    countPlayerA += 1;
-                    maxPlayerA = std::cmp::max(countPlayerA, maxPlayerA);
-                    countPlayerB = 0;
+                    count_player_a += 1;
+                    max_player_a = std::cmp::max(count_player_a, max_player_a);
+                    count_player_b = 0;
                 } else {
-                    countPlayerB += 1;
-                    maxPlayerB = std::cmp::max(countPlayerB, maxPlayerB);
-                    countPlayerA = 0;
+                    count_player_b += 1;
+                    max_player_b = std::cmp::max(count_player_b, max_player_b);
+                    count_player_a = 0;
                 }
             }
+
         }
 
-        evaluation += maxPlayerA - maxPlayerB;
+        evaluation += max_player_a - max_player_b;
     }
 
     // evaluate DIAGONALL RIGHT
     for k in 3..(WIDTH+HEIGHT-4) {
-        let mut maxPlayerA = 0;
-        let mut maxPlayerB = 0;
-        let mut countPlayerA = 0;
-        let mut countPlayerB = 0;        
+        let mut max_player_a = 0;
+        let mut max_player_b = 0;
+        let mut count_player_a = 0;
+        let mut count_player_b = 0;        
         for col in 0..(k+1) {
             let row: i32 = HEIGHT as i32 - k as i32 + col as i32;
             if row >= 0 && row < HEIGHT as i32 && col < WIDTH {
                 if boardValue!(board, row as usize, col) == EMPTY {
-                    countPlayerA = 0;
-                    countPlayerB = 0;
+                    count_player_a = 0;
+                    count_player_b = 0;
                     continue;
                 }
                 if boardValue!(board, row as usize, col) == PLAYER_A {
-                    countPlayerA += 1;
-                    maxPlayerA = std::cmp::max(countPlayerA, maxPlayerA);
-                    countPlayerB = 0;
+                    count_player_a += 1;
+                    max_player_a = std::cmp::max(count_player_a, max_player_a);
+                    count_player_b = 0;
                 } else {
-                    countPlayerB += 1;
-                    maxPlayerB = std::cmp::max(countPlayerB, maxPlayerB);
-                    countPlayerA = 0;
+                    count_player_b += 1;
+                    max_player_b = std::cmp::max(count_player_b, max_player_b);
+                    count_player_a = 0;
                 }
             }
         }
-        evaluation += maxPlayerA - maxPlayerB;
+
+        
+        evaluation += max_player_a - max_player_b;
     }
 
     evaluation
