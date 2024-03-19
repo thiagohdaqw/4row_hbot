@@ -2,7 +2,7 @@ mod solver;
 
 use solver::Board;
 
-use crate::solver::{solve, PLAYER_A};
+use crate::solver::solve;
 
 
 fn main() {
@@ -15,7 +15,7 @@ fn main() {
         0, 0, 0, 0, 0, 0, 0,
     ];
 
-    println!("{}", solve(board, 8));
+    // println!("{}", solve(board, 8));
 
     // let test = [
     //     'A','B','C','D','E','F','G',

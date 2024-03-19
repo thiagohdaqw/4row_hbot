@@ -1,5 +1,7 @@
-const WIDTH: usize = 7;
-const HEIGHT: usize = 6;
+use std::convert::TryInto;
+
+pub const WIDTH: usize = 7;
+pub const HEIGHT: usize = 6;
 
 macro_rules! boardValue {
     ($board: expr, $row: expr, $col: expr) => { $board[$row * WIDTH + $col] }
@@ -17,12 +19,12 @@ pub type Board = [u8; WIDTH * HEIGHT];
 const SCORE_MAX: i32 = i32::MAX;
 
 
-pub fn solve(board: Board, depth: usize) -> usize {
-    minimax(board, 0, depth, true, -SCORE_MAX, SCORE_MAX) as usize
+pub fn solve(board: &Board, depth: i32) -> usize {
+    minimax(board, 0, depth as usize, true, -SCORE_MAX, SCORE_MAX) as usize
 }
 
-fn minimax(board: Board, depth: usize, max_depth: usize, maximizing_player: bool, mut alpha: i32, mut beta: i32) -> i32 {
-    let player_won = is_game_over(&board, maximizing_player);
+fn minimax(board: &Board, depth: usize, max_depth: usize, maximizing_player: bool, mut alpha: i32, mut beta: i32) -> i32 {
+    let player_won = is_game_over(&board);
     if player_won {
         return SCORE_MAX*(if maximizing_player {1} else {-1});
     }
@@ -35,8 +37,8 @@ fn minimax(board: Board, depth: usize, max_depth: usize, maximizing_player: bool
 
     if maximizing_player {
         score = i32::MIN;
-        for (col, new_board) in generate_next_position(board, PLAYER_A) {
-            let new_score = minimax(new_board, depth + 1, max_depth, false, alpha, beta);
+        for (col, new_board) in generate_next_position(board.clone(), PLAYER_A) {
+            let new_score = minimax(&new_board, depth + 1, max_depth, false, alpha, beta);
             alpha = std::cmp::max(alpha, new_score);
             if new_score > score {
                 score = new_score;
@@ -48,8 +50,8 @@ fn minimax(board: Board, depth: usize, max_depth: usize, maximizing_player: bool
         }
     } else {
         score = i32::MAX;
-        for (col, new_board) in generate_next_position(board, PLAYER_B) {
-            let new_score = minimax(new_board, depth + 1, max_depth, true, alpha, beta);
+        for (col, new_board) in generate_next_position(board.clone(), PLAYER_B) {
+            let new_score = minimax(&new_board, depth + 1, max_depth, true, alpha, beta);
             beta = std::cmp::min(beta, new_score);
             if new_score < score {
                 score = new_score;
@@ -82,10 +84,10 @@ fn generate_next_position(board: Board, player: u8) -> impl Iterator<Item = (usi
         })
 }
 
-fn is_game_over(board: &Board, maximizing_player: bool) -> bool {
+pub fn is_game_over(board: &Board) -> bool {
     is_draw(board)
-    || !maximizing_player && player_won(board, PLAYER_A)
-    || maximizing_player && player_won(board, PLAYER_B)
+    || player_won(board, PLAYER_B)
+    || player_won(board, PLAYER_A)
 }
 
 fn is_draw(board: &Board) -> bool{
@@ -169,7 +171,7 @@ fn player_won(board: &Board, player: u8) -> bool {
     false
 }
 
-fn evaluate_position(board: Board) -> i32 {
+fn evaluate_position(board: &Board) -> i32 {
     let mut evaluation = 0;
     
     // evaluate horizontal
