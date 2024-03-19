@@ -196,7 +196,7 @@ fn evaluate_position(board: &Board) -> i32 {
 
         for col in 0..WIDTH {
             if boardValue!(board, row, col) == EMPTY {
-                count_player = 0;
+                // count_player = 0;
                 count_empty += 1;
                 continue;
             }
@@ -206,10 +206,10 @@ fn evaluate_position(board: &Board) -> i32 {
             }
         }
 
-        if max_player == 3 && count_empty > 0 {
+        if count_player == 3 && count_empty > 0 {
             evaluation += 100;
         } else {
-            evaluation += max_player + count_empty;
+            evaluation += count_player*5 + count_empty;
         }
     }
 
@@ -234,7 +234,7 @@ fn evaluate_position(board: &Board) -> i32 {
         if max_player == 3 && count_empty > 0 {
             evaluation += 100;
         } else {
-            evaluation += max_player + count_empty;
+            evaluation += count_player*5 + count_empty;
         }
     }
 
@@ -247,7 +247,7 @@ fn evaluate_position(board: &Board) -> i32 {
             let row: usize = k - col;
             if row < HEIGHT && col < WIDTH {
                 if boardValue!(board, row, col) == EMPTY {
-                    count_player = 0;
+                    // count_player = 0;
                     count_empty += 1;
                     continue;
                 }
@@ -261,7 +261,7 @@ fn evaluate_position(board: &Board) -> i32 {
         if max_player == 3 && count_empty > 0 {
             evaluation += 100;
         } else {
-            evaluation += max_player + count_empty;
+            evaluation += count_player + count_empty;
         }
     }
 
@@ -274,7 +274,7 @@ fn evaluate_position(board: &Board) -> i32 {
             let row: i32 = HEIGHT as i32 - k as i32 + col as i32;
             if row >= 0 && row < HEIGHT as i32 && col < WIDTH {
                 if boardValue!(board, row as usize, col) == EMPTY {
-                    count_player = 0;
+                    // count_player = 0;
                     count_empty += 1;
                     continue;
                 }
@@ -288,7 +288,7 @@ fn evaluate_position(board: &Board) -> i32 {
         if max_player == 3 && count_empty > 0 {
             evaluation += 100;
         } else {
-            evaluation += max_player + count_empty;
+            evaluation += count_player + count_empty;
         }
     }
 
