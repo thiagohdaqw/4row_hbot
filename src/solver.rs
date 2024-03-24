@@ -145,7 +145,7 @@ fn player_won(board: &Board, player: u8) -> bool {
     }
 
     // CHECK DIAGONALL LEFT
-    for k in 3..(WIDTH + HEIGHT - 4) {
+    for k in 3..(WIDTH + HEIGHT - 3) {
         let mut count = 0;
         for col in 0..(k + 1) {
             let row: usize = k - col;
@@ -164,7 +164,7 @@ fn player_won(board: &Board, player: u8) -> bool {
     }
 
     // CHECK DIAGONALL RIGHT
-    for k in 3..(WIDTH + HEIGHT - 4) {
+    for k in 3..(WIDTH + HEIGHT - 3) {
         let mut count = 0;
         for col in 0..(k + 1) {
             let row: i32 = HEIGHT as i32 - k as i32 + col as i32;
@@ -186,6 +186,10 @@ fn player_won(board: &Board, player: u8) -> bool {
 }
 
 fn evaluate_position(board: &Board) -> i32 {
+    evaluate_player_position(board, PLAYER_IA) - evaluate_player_position(board, PLAYER)
+}
+
+fn evaluate_player_position(board: &Board, player: u8) -> i32 {
     let mut evaluation = 0;
 
     // evaluate horizontal
@@ -200,7 +204,7 @@ fn evaluate_position(board: &Board) -> i32 {
                 count_empty += 1;
                 continue;
             }
-            if boardValue!(board, row, col) == PLAYER {
+            if boardValue!(board, row, col) == player {
                 count_player += 1;
                 max_player = std::cmp::max(count_player, max_player);
             }
@@ -225,7 +229,7 @@ fn evaluate_position(board: &Board) -> i32 {
                 count_empty += 1;
                 continue;
             }
-            if boardValue!(board, row, col) == PLAYER {
+            if boardValue!(board, row, col) == player {
                 count_player += 1;
                 max_player = std::cmp::max(count_player, max_player);
             }
@@ -239,7 +243,7 @@ fn evaluate_position(board: &Board) -> i32 {
     }
 
     // evaluate DIAGONALL LEFT
-    for k in 3..(WIDTH + HEIGHT - 4) {
+    for k in 3..(WIDTH + HEIGHT - 3) {
         let mut max_player = 0;
         let mut count_player = 0;
         let mut count_empty = 0;
@@ -251,7 +255,7 @@ fn evaluate_position(board: &Board) -> i32 {
                     count_empty += 1;
                     continue;
                 }
-                if boardValue!(board, row, col) == PLAYER {
+                if boardValue!(board, row, col) == player {
                     count_player += 1;
                     max_player = std::cmp::max(count_player, max_player);
                 }
@@ -266,7 +270,7 @@ fn evaluate_position(board: &Board) -> i32 {
     }
 
     // evaluate DIAGONALL RIGHT
-    for k in 3..(WIDTH + HEIGHT - 4) {
+    for k in 3..(WIDTH + HEIGHT - 3) {
         let mut max_player = 0;
         let mut count_player = 0;
         let mut count_empty = 0;
@@ -278,7 +282,7 @@ fn evaluate_position(board: &Board) -> i32 {
                     count_empty += 1;
                     continue;
                 }
-                if boardValue!(board, row as usize, col) == PLAYER {
+                if boardValue!(board, row as usize, col) == player {
                     count_player += 1;
                     max_player = std::cmp::max(count_player, max_player);
                 }
