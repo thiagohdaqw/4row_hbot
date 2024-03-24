@@ -13,3 +13,7 @@ $ ./build-wasm.sh
 $ python3 -m http.server 9999
 # acessar http://localhost:9999
 ```
+
+# TODO:
+
+- [] adicionar randomicidade nas jogadas para não se tornar repetitivo

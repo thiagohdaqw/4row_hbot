@@ -51,7 +51,7 @@ fn minimax(
 
     if maximizing_player {
         score = i32::MIN;
-        for (col, new_board) in generate_next_position(board.clone(), PLAYER_IA) {
+        for (col, new_board) in generate_next_position(*board, PLAYER_IA) {
             let new_score = minimax(&new_board, depth + 1, max_depth, false, alpha, beta);
             if new_score >= score {
                 score = new_score;
@@ -64,7 +64,7 @@ fn minimax(
         }
     } else {
         score = i32::MAX;
-        for (col, new_board) in generate_next_position(board.clone(), PLAYER) {
+        for (col, new_board) in generate_next_position(*board, PLAYER) {
             let new_score = minimax(&new_board, depth + 1, max_depth, true, alpha, beta);
             if new_score <= score {
                 score = new_score;
@@ -87,7 +87,7 @@ fn generate_next_position(board: Board, player: u8) -> impl Iterator<Item = (usi
     (0..WIDTH)
         .filter(move |col| boardLastRowValue!(board, col) == EMPTY)
         .map(move |col| {
-            let mut new_board = board.clone();
+            let mut new_board = board;
             for row in 0..HEIGHT {
                 if boardValue!(new_board, row, col) == EMPTY {
                     boardValue!(new_board, row, col) = player;
